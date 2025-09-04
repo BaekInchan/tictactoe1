@@ -21,7 +21,7 @@ public abstract class BasePlayerState
             }
             else
             {
-                // TODO: gameLogic에게 GameOver 전달
+                gameLogic.EndGame(gameResult);
             }
         }
     }

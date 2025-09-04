@@ -1,8 +1,12 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameUIController : MonoBehaviour
 {
+    [SerializeField] private GameObject playerATurnPanel;
+    [SerializeField] private GameObject playerBTurnPanel;
+
+    public enum GameTurnPanelType { None, ATurn, BTurn }
+
     public void OnClickBackButton()
     {
         //GameManager.Instance.ChangeToMainScene();
@@ -11,5 +15,24 @@ public class GameUIController : MonoBehaviour
         
     }
 
+    public void SetGameTurnPanel(GameTurnPanelType gameTrunPanelType)
+    {
+        switch (gameTrunPanelType)
+        {
+            case GameTurnPanelType.None:
+                playerATurnPanel.SetActive(false);
+                playerBTurnPanel.SetActive(false);
+                break;
+            case GameTurnPanelType.ATurn:
+                playerATurnPanel.SetActive(true);
+                playerBTurnPanel.SetActive(false);
+                break;
+            case GameTurnPanelType.BTurn:
+                playerATurnPanel.SetActive(false);
+                playerBTurnPanel.SetActive(true);
+                break;
+        }
 
+        
+    }
 }
