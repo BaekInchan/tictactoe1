@@ -10,10 +10,15 @@ public class ConfirmPanelController : PanelController
     /// <summary>
     /// Confirm Panel을 표시
     /// </summary>
+    
+    // Confirm 클릭시 호출될 Delegate
+    public delegate void OnConfirmButtonClicked();
+    private OnConfirmButtonClicked _onConfirmButtonClicked;
 
-    public void Show(string message)
+    public void Show(string message, OnConfirmButtonClicked onConfirmButtonClicked)
     {
         messageText.text = message;
+        _onConfirmButtonClicked = onConfirmButtonClicked;
         base.Show();
     }
 
@@ -23,8 +28,7 @@ public class ConfirmPanelController : PanelController
     
     public void OnClickConfirmButton()
     {
-        Hide();
-        SceneManager.LoadScene("Main");
+        Hide(() => _onConfirmButtonClicked?.Invoke());
     }
 
     /// <summary>
