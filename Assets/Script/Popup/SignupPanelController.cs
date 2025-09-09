@@ -33,7 +33,7 @@ public class SignupPanelController : PanelController
             var signupData = new SignupData();
             signupData.username = username;
             signupData.password = password;
-            signupData.password = nickname;
+            signupData.nickname = nickname;
             StartCoroutine(NetworkManager.Instance.Signup(signupData, () =>
             {
                 GameManager.Instance.OpenConfirmPanel("회원가입에 성공했습니다", () =>

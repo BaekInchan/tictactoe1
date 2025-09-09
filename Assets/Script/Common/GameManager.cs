@@ -1,11 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
-    [SerializeField] private GameObject confirmPanel;
-    [SerializeField] private GameObject signinPanel;
-    [SerializeField] private GameObject signupPanel;
+    [SerializeField] private GameObject confirmPanel;           // 확인 패널
+    [SerializeField] private GameObject signinPanel;            // 로그인 패널
+    [SerializeField] private GameObject signupPanel;            // 회원가입 패널
 
     // Main Scene에서 선택한 게임 타입
     private Constants.GameType _gameType;
@@ -13,7 +14,7 @@ public class GameManager : Singleton<GameManager>
     // Panel을 띄우기 위한 Canvas 정보
     private Canvas _canvas;
 
-    // GameLogic
+    // Game Logic
     private GameLogic _gameLogic;
 
     // Game 씬의 UI를 담당하는 객체
@@ -21,11 +22,11 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
+        // 로그인
         var sid = PlayerPrefs.GetString("sid");
         if (string.IsNullOrEmpty(sid))
         {
             OpenSigninPanel();
-
         }
     }
 
@@ -43,6 +44,8 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void ChangeToMainScene()
     {
+        _gameLogic?.Dispose();
+        _gameLogic = null;
         SceneManager.LoadScene("Main");
     }
 
@@ -50,12 +53,14 @@ public class GameManager : Singleton<GameManager>
     /// Confirm Panel을 띄우는 메서드
     /// </summary>
     /// <param name="message"></param>
-    public void OpenConfirmPanel(string message, ConfirmPanelController.OnConfirmButtonClicked onConfirmButtonClicked)
+    public void OpenConfirmPanel(string message,
+        ConfirmPanelController.OnConfirmButtonClicked onConfirmButtonClicked)
     {
         if (_canvas != null)
         {
             var confirmPanelObject = Instantiate(confirmPanel, _canvas.transform);
-            confirmPanelObject.GetComponent<ConfirmPanelController>().Show(message, onConfirmButtonClicked);
+            confirmPanelObject.GetComponent<ConfirmPanelController>()
+                .Show(message, onConfirmButtonClicked);
         }
     }
 
@@ -64,7 +69,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void OpenSigninPanel()
     {
-        if(_canvas != null)
+        if (_canvas != null)
         {
             var signinPanelObject = Instantiate(signinPanel, _canvas.transform);
             signinPanelObject.GetComponent<SigninPanelController>().Show();
@@ -83,8 +88,7 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// Game Scene에서 턴을 표시하는 UI를 제어하는 함수
     /// </summary>
-    /// <param name="gameTurnPanelType"></param>
-
+    /// <param name="gameTurnPanelType">표시할 Turn 정보</param>
     public void SetGameTurnPanel(GameUIController.GameTurnPanelType gameTurnPanelType)
     {
         _gameUIController.SetGameTurnPanel(gameTurnPanelType);
@@ -98,18 +102,27 @@ public class GameManager : Singleton<GameManager>
         {
             // Block 초기화
             var blockController = FindFirstObjectByType<BlockController>();
-            blockController.InitBlocks();
+            if (blockController != null)
+            {
+                blockController.InitBlocks();
+            }
 
             // Game UI Controller 할당 및 초기화
-
             _gameUIController = FindFirstObjectByType<GameUIController>();
-            if(_gameUIController != null)
+            if (_gameUIController != null)
+            {
                 _gameUIController.SetGameTurnPanel(GameUIController.GameTurnPanelType.None);
+            }
 
             // GameLogic 생성
+            if (_gameLogic != null) _gameLogic.Dispose();
             _gameLogic = new GameLogic(blockController, _gameType);
         }
     }
 
-
+    private void OnApplicationQuit()
+    {
+        _gameLogic?.Dispose();
+        _gameLogic = null;
+    }
 }
